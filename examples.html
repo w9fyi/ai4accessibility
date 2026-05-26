@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Examples — AI4Accessibility</title>
+  <meta name="description" content="Working accessibility patterns for developers: skip links, live regions, focus-managed dialogs, accessible forms, and more. Tested with VoiceOver on macOS Safari.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="examples.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header role="banner">
+    <div class="container">
+      <a href="/" class="site-title">AI<span class="accent">4</span>Accessibility</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/built-with-ai.html">Built with AI</a></li>
+          <li><a href="/examples.html" aria-current="page">Examples</a></li>
+          <li><a href="https://github.com/w9fyi" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading">Accessibility Examples</h1>
+        <p class="hero-sub">Working patterns for developers. Each example includes a live demo and the complete code. All examples are tested with VoiceOver on macOS Safari.</p>
+      </div>
+    </section>
+
+    <nav class="example-nav" aria-label="Jump to example">
+      <div class="container">
+        <p id="examples-nav-label">Jump to:</p>
+        <ul aria-labelledby="examples-nav-label">
+          <li><a href="#skip-link">Skip Link</a></li>
+          <li><a href="#sr-only">Screen Reader Text</a></li>
+          <li><a href="#landmarks">ARIA Landmarks</a></li>
+          <li><a href="#icon-button">Icon Button</a></li>
+          <li><a href="#disclosure">Disclosure Widget</a></li>
+          <li><a href="#live-region">Live Region</a></li>
+          <li><a href="#form">Accessible Form</a></li>
+          <li><a href="#dialog">Focus-Managed Dialog</a></li>
+          <li><a href="#table">Data Table</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="examples-wrapper">
+      <div class="container">
+
+        <!-- Example 1: Skip Link -->
+        <article class="example" id="skip-link" aria-labelledby="ex-skip-heading">
+          <h2 id="ex-skip-heading">1. Skip Navigation Link</h2>
+          <p class="ex-desc">A visually hidden link that appears on keyboard focus, letting screen reader and keyboard users jump past repeated navigation directly to main content. Required for WCAG 2.4.1.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Tab once from the top of the page. The skip link should be announced and become visible. Activate it and confirm focus lands on main content.</p>
+
+          <div class="live-demo" aria-label="Live demo: Skip link">
+            <p class="demo-label" aria-hidden="true">Live demo — tab into this area:</p>
+            <div class="demo-frame" role="region" aria-label="Skip link demo">
+              <a class="demo-skip-link" href="#demo-main-1">Skip to demo content</a>
+              <nav aria-label="Demo navigation">
+                <ul>
+                  <li><a href="#skip-link">Home</a></li>
+                  <li><a href="#skip-link">About</a></li>
+                  <li><a href="#skip-link">Contact</a></li>
+                </ul>
+              </nav>
+              <div id="demo-main-1" tabindex="-1">
+                <p>Main content starts here. Focus lands here when the skip link is activated.</p>
+              </div>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- In &lt;head&gt;: --&gt;
+&lt;style&gt;
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    background: #ffe066;
+    color: #000;
+    padding: 0.5rem 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 9999;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+&lt;/style&gt;
+
+&lt;!-- First element inside &lt;body&gt;: --&gt;
+&lt;a class="skip-link" href="#main"&gt;Skip to main content&lt;/a&gt;
+
+&lt;!-- Target element: --&gt;
+&lt;main id="main" tabindex="-1"&gt;
+  &lt;!-- page content --&gt;
+&lt;/main&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 2: Screen Reader-Only Text -->
+        <article class="example" id="sr-only" aria-labelledby="ex-sr-heading">
+          <h2 id="ex-sr-heading">2. Screen Reader-Only Text</h2>
+          <p class="ex-desc">The <code>.sr-only</code> pattern visually hides text while keeping it in the accessibility tree. Use it to add context that sighted users get from visual layout but screen reader users would otherwise miss.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Navigate the buttons below. VoiceOver should announce "Edit Justin Mann" and "Delete Justin Mann", not just "Edit" and "Delete".</p>
+
+          <div class="live-demo" aria-label="Live demo: Screen reader-only text">
+            <div class="demo-frame">
+              <table class="demo-table">
+                <caption>User list</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Role</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Justin Mann</td>
+                    <td>Admin</td>
+                    <td>
+                      <button type="button">Edit<span class="sr-only"> Justin Mann</span></button>
+                      <button type="button">Delete<span class="sr-only"> Justin Mann</span></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Alex Chen</td>
+                    <td>Member</td>
+                    <td>
+                      <button type="button">Edit<span class="sr-only"> Alex Chen</span></button>
+                      <button type="button">Delete<span class="sr-only"> Alex Chen</span></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;style&gt;
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+&lt;/style&gt;
+
+&lt;button type="button"&gt;
+  Edit&lt;span class="sr-only"&gt; Justin Mann&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;button type="button"&gt;
+  Delete&lt;span class="sr-only"&gt; Justin Mann&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 3: ARIA Landmarks -->
+        <article class="example" id="landmarks" aria-labelledby="ex-landmarks-heading">
+          <h2 id="ex-landmarks-heading">3. ARIA Landmarks</h2>
+          <p class="ex-desc">Landmark roles let screen reader users jump between major page regions. VoiceOver users press <kbd>W</kbd> or use the Rotor to navigate landmarks. Every page should have at least <code>banner</code>, <code>main</code>, and <code>contentinfo</code>.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Open the Rotor (VO + U), navigate to Landmarks, and confirm all major regions of the page are listed by their label.</p>
+
+          <div class="live-demo" aria-label="Live demo: Landmarks structure">
+            <div class="demo-frame demo-landmarks">
+              <div role="banner" class="demo-region"><code>role="banner"</code> — site header</div>
+              <div role="navigation" aria-label="Primary" class="demo-region"><code>role="navigation"</code> — labeled nav</div>
+              <div role="main" class="demo-region"><code>role="main"</code> — primary content</div>
+              <div role="complementary" aria-label="Related links" class="demo-region"><code>role="complementary"</code> — sidebar</div>
+              <div role="contentinfo" class="demo-region"><code>role="contentinfo"</code> — footer</div>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Use native HTML elements where possible --&gt;
+&lt;header role="banner"&gt;
+  &lt;nav aria-label="Primary"&gt;...&lt;/nav&gt;
+&lt;/header&gt;
+
+&lt;main id="main"&gt;
+  &lt;!-- page content --&gt;
+&lt;/main&gt;
+
+&lt;aside aria-label="Related links"&gt;
+  &lt;!-- sidebar --&gt;
+&lt;/aside&gt;
+
+&lt;footer role="contentinfo"&gt;
+  &lt;!-- footer --&gt;
+&lt;/footer&gt;
+
+&lt;!-- Multiple navs need unique labels --&gt;
+&lt;nav aria-label="Primary"&gt;...&lt;/nav&gt;
+&lt;nav aria-label="Breadcrumb"&gt;...&lt;/nav&gt;
+&lt;nav aria-label="Pagination"&gt;...&lt;/nav&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 4: Icon Button -->
+        <article class="example" id="icon-button" aria-labelledby="ex-icon-heading">
+          <h2 id="ex-icon-heading">4. Icon Button</h2>
+          <p class="ex-desc">Buttons that contain only an icon have no accessible name by default. Always provide an <code>aria-label</code>. Never use <code>&lt;div&gt;</code> or <code>&lt;span&gt;</code> for clickable controls — use <code>&lt;button type="button"&gt;</code>.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Tab to each button. The first should announce "button" with no name (broken). The second should announce "Close dialog, button". The third should announce "Search, button".</p>
+
+          <div class="live-demo" aria-label="Live demo: Icon buttons">
+            <div class="demo-frame demo-buttons">
+              <div class="button-row">
+                <span class="label-bad">Broken:</span>
+                <button type="button" class="icon-btn" title="This title is not reliable for screen readers">
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <line x1="2" y1="2" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="18" y1="2" x2="2" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="button-row">
+                <span class="label-good">Fixed:</span>
+                <button type="button" class="icon-btn" aria-label="Close dialog">
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <line x1="2" y1="2" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="18" y1="2" x2="2" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+                <button type="button" class="icon-btn" aria-label="Search">
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2.5"/>
+                    <line x1="13" y1="13" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Broken: no accessible name --&gt;
+&lt;button type="button"&gt;
+  &lt;svg ...&gt;&lt;/svg&gt;
+&lt;/button&gt;
+
+&lt;!-- Fixed: aria-label provides the name --&gt;
+&lt;button type="button" aria-label="Close dialog"&gt;
+  &lt;svg aria-hidden="true" focusable="false" ...&gt;&lt;/svg&gt;
+&lt;/button&gt;
+
+&lt;!-- Or: visually hidden text inside the button --&gt;
+&lt;button type="button"&gt;
+  &lt;svg aria-hidden="true" focusable="false" ...&gt;&lt;/svg&gt;
+  &lt;span class="sr-only"&gt;Close dialog&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;!-- Never do this --&gt;
+&lt;div onclick="..."&gt;&lt;/div&gt; &lt;!-- not keyboard accessible --&gt;
+&lt;span onclick="..."&gt;&lt;/span&gt; &lt;!-- not keyboard accessible --&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 5: Disclosure Widget -->
+        <article class="example" id="disclosure" aria-labelledby="ex-disclosure-heading">
+          <h2 id="ex-disclosure-heading">5. Disclosure Widget (Accordion)</h2>
+          <p class="ex-desc">The native HTML <code>&lt;details&gt;</code> and <code>&lt;summary&gt;</code> elements provide a fully accessible show/hide widget with no JavaScript required. VoiceOver announces the expanded/collapsed state automatically.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Navigate to the summary elements. VoiceOver should announce the heading text and "collapsed" or "expanded". Space or Enter should toggle the state.</p>
+
+          <div class="live-demo" aria-label="Live demo: Disclosure widget">
+            <div class="demo-frame">
+              <details class="demo-details">
+                <summary>What is WCAG?</summary>
+                <div class="details-content">
+                  <p>The Web Content Accessibility Guidelines (WCAG) are a set of recommendations for making web content more accessible, primarily to people with disabilities. WCAG 2.2 is the current standard, with levels A, AA, and AAA.</p>
+                </div>
+              </details>
+              <details class="demo-details">
+                <summary>What is VoiceOver?</summary>
+                <div class="details-content">
+                  <p>VoiceOver is Apple's built-in screen reader, available on macOS, iOS, iPadOS, tvOS, and watchOS. Enable it with Command+F5 on Mac or triple-click the side button on iPhone.</p>
+                </div>
+              </details>
+              <details class="demo-details">
+                <summary>What is ARIA?</summary>
+                <div class="details-content">
+                  <p>Accessible Rich Internet Applications (ARIA) is a set of HTML attributes that define ways to make web content more accessible. The first rule of ARIA: if you can use a native HTML element instead, do that.</p>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- No JavaScript required --&gt;
+&lt;details&gt;
+  &lt;summary&gt;Question or section heading&lt;/summary&gt;
+  &lt;div&gt;
+    &lt;p&gt;Revealed content goes here.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/details&gt;
+
+&lt;!-- Open by default --&gt;
+&lt;details open&gt;
+  &lt;summary&gt;Expanded by default&lt;/summary&gt;
+  &lt;div&gt;...&lt;/div&gt;
+&lt;/details&gt;
+
+&lt;style&gt;
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.75rem;
+  }
+  summary:focus-visible {
+    outline: 3px solid #ffe066;
+    outline-offset: 2px;
+  }
+  details[open] summary {
+    border-bottom: 1px solid #333;
+  }
+&lt;/style&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 6: Live Region -->
+        <article class="example" id="live-region" aria-labelledby="ex-live-heading">
+          <h2 id="ex-live-heading">6. Live Region Announcements</h2>
+          <p class="ex-desc">Live regions announce dynamic content changes to screen reader users who aren't currently focused on that area. Use <code>aria-live="polite"</code> for non-urgent updates and <code>aria-live="assertive"</code> (or <code>role="alert"</code>) for errors and critical messages.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Click the buttons below. VoiceOver should announce the status message without you moving focus.</p>
+
+          <div class="live-demo" aria-label="Live demo: Live region">
+            <div class="demo-frame">
+              <div class="live-region-demo">
+                <button type="button" onclick="document.getElementById('status-demo').textContent='File saved successfully.'">Save file</button>
+                <button type="button" onclick="document.getElementById('status-demo').textContent='3 items added to cart.'">Add to cart</button>
+                <button type="button" onclick="document.getElementById('error-demo').textContent='Error: connection failed. Please try again.'">Trigger error</button>
+                <button type="button" onclick="document.getElementById('status-demo').textContent=''; document.getElementById('error-demo').textContent=''">Clear</button>
+              </div>
+              <div id="status-demo" role="status" aria-live="polite" aria-atomic="true" class="live-output"></div>
+              <div id="error-demo" role="alert" aria-live="assertive" aria-atomic="true" class="live-output live-output--error"></div>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Polite: announced when user is idle --&gt;
+&lt;div
+  id="status"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+&gt;&lt;/div&gt;
+
+&lt;!-- Assertive: announced immediately, interrupts --&gt;
+&lt;div
+  id="error"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+&gt;&lt;/div&gt;
+
+&lt;script&gt;
+  // Polite notification
+  document.getElementById('status').textContent = 'File saved.';
+
+  // Error announcement
+  document.getElementById('error').textContent = 'Connection failed.';
+&lt;/script&gt;
+
+&lt;!-- Rules:
+  1. The live region must exist in the DOM before content is injected.
+  2. aria-atomic="true" announces the full region, not just the changed part.
+  3. Use role="status" for confirmations, role="alert" for errors.
+  4. Never use assertive for non-errors — it interrupts screen reader output.
+--&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 7: Accessible Form -->
+        <article class="example" id="form" aria-labelledby="ex-form-heading">
+          <h2 id="ex-form-heading">7. Accessible Form</h2>
+          <p class="ex-desc">Every input needs a visible <code>&lt;label&gt;</code> associated via <code>for</code> and <code>id</code>. Error messages must be programmatically associated with their field via <code>aria-describedby</code>. Required fields need <code>aria-required="true"</code>.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Navigate to each field. VoiceOver should announce the label, the input type, and any hint text. The error state should announce "invalid" and read the error message.</p>
+
+          <div class="live-demo" aria-label="Live demo: Accessible form">
+            <div class="demo-frame">
+              <form class="demo-form" onsubmit="return false;">
+                <div class="field">
+                  <label for="name-input">Full name <span class="required-marker" aria-hidden="true">*</span></label>
+                  <input
+                    type="text"
+                    id="name-input"
+                    name="name"
+                    aria-required="true"
+                    aria-describedby="name-hint"
+                    autocomplete="name"
+                  >
+                  <div id="name-hint" class="field-hint">Enter your first and last name.</div>
+                </div>
+
+                <div class="field">
+                  <label for="email-input">Email address <span class="required-marker" aria-hidden="true">*</span></label>
+                  <input
+                    type="email"
+                    id="email-input"
+                    name="email"
+                    aria-required="true"
+                    aria-invalid="true"
+                    aria-describedby="email-error"
+                    autocomplete="email"
+                    value="not-an-email"
+                  >
+                  <div id="email-error" class="field-error" role="alert">Enter a valid email address.</div>
+                </div>
+
+                <div class="field">
+                  <fieldset>
+                    <legend>Preferred contact method</legend>
+                    <label class="radio-label">
+                      <input type="radio" name="contact" value="email"> Email
+                    </label>
+                    <label class="radio-label">
+                      <input type="radio" name="contact" value="phone"> Phone
+                    </label>
+                  </fieldset>
+                </div>
+
+                <button type="submit">Submit</button>
+              </form>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;form&gt;
+  &lt;!-- Basic labeled input --&gt;
+  &lt;div&gt;
+    &lt;label for="name"&gt;
+      Full name
+      &lt;span aria-hidden="true"&gt;*&lt;/span&gt;
+    &lt;/label&gt;
+    &lt;input
+      type="text"
+      id="name"
+      name="name"
+      aria-required="true"
+      aria-describedby="name-hint"
+      autocomplete="name"
+    &gt;
+    &lt;div id="name-hint"&gt;Enter your first and last name.&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Invalid state with error message --&gt;
+  &lt;div&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input
+      type="email"
+      id="email"
+      aria-required="true"
+      aria-invalid="true"
+      aria-describedby="email-error"
+    &gt;
+    &lt;div id="email-error" role="alert"&gt;
+      Enter a valid email address.
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Radio group uses fieldset + legend --&gt;
+  &lt;fieldset&gt;
+    &lt;legend&gt;Preferred contact method&lt;/legend&gt;
+    &lt;label&gt;&lt;input type="radio" name="contact" value="email"&gt; Email&lt;/label&gt;
+    &lt;label&gt;&lt;input type="radio" name="contact" value="phone"&gt; Phone&lt;/label&gt;
+  &lt;/fieldset&gt;
+&lt;/form&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 8: Focus-Managed Dialog -->
+        <article class="example" id="dialog" aria-labelledby="ex-dialog-heading">
+          <h2 id="ex-dialog-heading">8. Focus-Managed Dialog</h2>
+          <p class="ex-desc">Dialogs must trap focus while open, move focus to the dialog on open, and return focus to the trigger on close. The native <code>&lt;dialog&gt;</code> element handles this automatically in modern browsers.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Click "Open dialog". Focus should land inside the dialog and VoiceOver should announce the dialog role and heading. Tab should cycle only within the dialog. Escape or the close button should dismiss it and return focus to the trigger.</p>
+
+          <div class="live-demo" aria-label="Live demo: Focus-managed dialog">
+            <div class="demo-frame">
+              <button type="button" id="dialog-trigger" onclick="document.getElementById('demo-dialog').showModal()">
+                Open dialog
+              </button>
+              <dialog id="demo-dialog" aria-labelledby="dialog-title" class="demo-dialog">
+                <h3 id="dialog-title">Confirm action</h3>
+                <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+                <div class="dialog-actions">
+                  <button type="button" onclick="document.getElementById('demo-dialog').close()">Cancel</button>
+                  <button type="button" onclick="document.getElementById('demo-dialog').close()">Delete</button>
+                </div>
+              </dialog>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Trigger --&gt;
+&lt;button type="button" id="dialog-trigger"&gt;
+  Open dialog
+&lt;/button&gt;
+
+&lt;!-- Dialog --&gt;
+&lt;dialog
+  id="my-dialog"
+  aria-labelledby="dialog-title"
+&gt;
+  &lt;h2 id="dialog-title"&gt;Confirm action&lt;/h2&gt;
+  &lt;p&gt;Are you sure? This cannot be undone.&lt;/p&gt;
+  &lt;div&gt;
+    &lt;button type="button" id="cancel-btn"&gt;Cancel&lt;/button&gt;
+    &lt;button type="button"&gt;Confirm&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;
+
+&lt;script&gt;
+  const trigger = document.getElementById('dialog-trigger');
+  const dialog = document.getElementById('my-dialog');
+  const cancel = document.getElementById('cancel-btn');
+
+  // Open: showModal() handles focus trap automatically
+  trigger.addEventListener('click', () =&gt; dialog.showModal());
+
+  // Close: focus returns to trigger
+  dialog.addEventListener('close', () =&gt; trigger.focus());
+
+  cancel.addEventListener('click', () =&gt; dialog.close());
+
+  // Escape key is handled by the browser automatically
+&lt;/script&gt;
+
+&lt;!-- Note: dialog.showModal() creates a native focus trap.
+     dialog.show() (no focus trap) is for non-modal panels. --&gt;</code></pre>
+          </details>
+        </article>
+
+        <!-- Example 9: Data Table -->
+        <article class="example" id="table" aria-labelledby="ex-table-heading">
+          <h2 id="ex-table-heading">9. Accessible Data Table</h2>
+          <p class="ex-desc">Tables need a <code>&lt;caption&gt;</code> describing the data, <code>scope="col"</code> or <code>scope="row"</code> on header cells, and <code>&lt;thead&gt;</code> / <code>&lt;tbody&gt;</code> structure. Never use tables for layout.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Navigate into the table. VoiceOver should announce "table, [caption], [column count] columns". Moving through cells should announce the cell value and the associated column header.</p>
+
+          <div class="live-demo" aria-label="Live demo: Accessible data table">
+            <div class="demo-frame">
+              <table class="demo-table-full">
+                <caption>Amateur radio band plan — HF frequencies</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Band</th>
+                    <th scope="col">Frequency (MHz)</th>
+                    <th scope="col">License required</th>
+                    <th scope="col">Typical use</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>80m</td>
+                    <td>3.5 – 4.0</td>
+                    <td>General</td>
+                    <td>Regional SSB, CW</td>
+                  </tr>
+                  <tr>
+                    <td>40m</td>
+                    <td>7.0 – 7.3</td>
+                    <td>Technician (CW only below 7.125)</td>
+                    <td>Domestic + DX SSB, CW</td>
+                  </tr>
+                  <tr>
+                    <td>20m</td>
+                    <td>14.0 – 14.35</td>
+                    <td>General</td>
+                    <td>International DX, contests</td>
+                  </tr>
+                  <tr>
+                    <td>10m</td>
+                    <td>28.0 – 29.7</td>
+                    <td>Technician (above 28.3)</td>
+                    <td>SSB, FM, digital when band is open</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;table&gt;
+  &lt;!-- Required: describes what the table contains --&gt;
+  &lt;caption&gt;Monthly sales by region&lt;/caption&gt;
+
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;!-- scope="col" associates header with column --&gt;
+      &lt;th scope="col"&gt;Region&lt;/th&gt;
+      &lt;th scope="col"&gt;Q1&lt;/th&gt;
+      &lt;th scope="col"&gt;Q2&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;!-- scope="row" associates header with row --&gt;
+      &lt;th scope="row"&gt;North&lt;/th&gt;
+      &lt;td&gt;$12,400&lt;/td&gt;
+      &lt;td&gt;$14,200&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;South&lt;/th&gt;
+      &lt;td&gt;$9,800&lt;/td&gt;
+      &lt;td&gt;$11,100&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+
+  &lt;!-- Optional: totals row --&gt;
+  &lt;tfoot&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;Total&lt;/th&gt;
+      &lt;td&gt;$22,200&lt;/td&gt;
+      &lt;td&gt;$25,300&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+          </details>
+        </article>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Built by <a href="https://github.com/w9fyi" rel="noopener noreferrer">Justin Mann (@w9fyi)</a> &mdash; AI5OS &mdash; Austin, TX</p>
+      <p class="footer-note">All examples tested with VoiceOver on macOS Safari. WCAG 2.2 AAA contrast throughout.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Built with AI — AI4Accessibility</title>
+  <meta name="description" content="How AI-assisted development changes the economics of accessibility work. The collaboration model, workflow, and results.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header role="banner">
+    <div class="container">
+      <a href="/" class="site-title">AI<span class="accent">4</span>Accessibility</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/built-with-ai.html" aria-current="page">Built with AI</a></li>
+          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="https://github.com/w9fyi" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading">Built with AI</h1>
+        <p class="hero-sub">How a blind developer uses AI as a full development partner — and why it changes the economics of accessibility work entirely.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="problem-heading">
+      <div class="container">
+        <h2 id="problem-heading">The Problem</h2>
+        <p>Accessibility takes time. It requires knowing the WCAG specification, understanding how screen readers work, thinking about keyboard navigation, writing ARIA attributes, and testing with actual assistive technology. Most development teams have one accessibility advocate who fights for attention among competing priorities — and when deadlines hit, accessibility gets cut.</p>
+        <p>For blind developers, this creates a compounded problem. The people most motivated to build accessible software often lack the development bandwidth to ship features quickly, while sighted teams have the bandwidth but lack the sustained attention or lived experience to do it right.</p>
+        <p>The result is predictable: the tools that blind users need most are built by sighted people who test them last.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="why-ai-heading">
+      <div class="container">
+        <h2 id="why-ai-heading">Why AI Changes This</h2>
+        <p>A language model trained on documentation, specifications, and open-source code can hold the entire WCAG 2.2 specification in context while writing code. It doesn't get distracted. It doesn't deprioritize accessibility because it "takes too long." It doesn't forget that form inputs need labels or that modals need focus traps.</p>
+        <p>When used as a full development partner — not as autocomplete, but as a collaborator that understands both the goal and the specification — AI compresses the time between "this needs to be accessible" and "this is accessible."</p>
+        <p>The 1,089-line Node-RED accessibility layer on this site was built in a single session. Not because it was easy — Node-RED's canvas-based editor is genuinely complex — but because the AI could hold the full scope of the problem (canvas node labels, dialog focus management, palette keyboard navigation, live region announcements, tab bar accessibility) simultaneously, without dropping threads.</p>
+        <p>That kind of sustained, specification-aware attention is exactly what accessibility work demands and exactly what most development processes fail to provide.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="workflow-heading">
+      <div class="container">
+        <h2 id="workflow-heading">The Workflow</h2>
+        <p>Every project follows the same core loop:</p>
+        <ol class="workflow-steps">
+          <li>
+            <strong>Identify the problem with VoiceOver.</strong>
+            Navigate the interface with a screen reader and note exactly what gets announced, what gets skipped, and where focus goes. A blind developer doing this already knows what's wrong — the problem is always felt before it's described.
+          </li>
+          <li>
+            <strong>Describe the problem precisely.</strong>
+            Not "this isn't accessible" but: "When I tab to the palette item, VoiceOver announces the SVG element's bounding box coordinates instead of the node's label. There is no role, no aria-label, and focus is never returned to the palette after a dialog closes." Concrete description produces concrete fixes.
+          </li>
+          <li>
+            <strong>Generate the conformant implementation.</strong>
+            Claude writes the fix — ARIA roles, keyboard event handlers, focus management, live regions — with the WCAG success criterion in context. The output is reviewed, not blindly applied.
+          </li>
+          <li>
+            <strong>Test with VoiceOver.</strong>
+            Deploy to the live environment and navigate with a screen reader. Note what changed and what didn't. This step requires a human with a working screen reader — AI cannot substitute for lived experience here.
+          </li>
+          <li>
+            <strong>Iterate.</strong>
+            Describe the delta between what VoiceOver announced and what it should have announced. Repeat until correct. Most fixes require two to four iterations.
+          </li>
+        </ol>
+        <p>The critical insight is step two. The more precisely you can describe what a screen reader experiences, the better the generated output. Blind developers have a structural advantage here: they already know exactly what's wrong, in the terms that matter.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="voiceover-first-heading">
+      <div class="container">
+        <h2 id="voiceover-first-heading">What "VoiceOver-First" Means</h2>
+        <p>VoiceOver-first is not the same as accessible. It means designing the user experience specifically for VoiceOver navigation before thinking about the visual presentation. In practice:</p>
+        <ul>
+          <li>Content structure is defined by <strong>headings</strong>, not by visual layout. If the page doesn't make sense as an outline, the structure is wrong.</li>
+          <li>Interactive elements are designed around <strong>keyboard events and ARIA states</strong>, not around click handlers and visual indicators.</li>
+          <li>Feedback is delivered via <strong>live regions</strong> that announce changes to screen reader users, not via color changes or icon swaps that only sighted users see.</li>
+          <li>Labels are written for <strong>what VoiceOver will announce</strong> — then the visual copy is made to match, not the other way around.</li>
+          <li>Every new component is tested with VoiceOver <strong>before</strong> it is considered done. Accessibility is not a post-ship audit.</li>
+        </ul>
+        <p>The sighted experience is built on top of the accessible structure. When you start with a screen-reader-navigable document, adding visual polish is straightforward. The reverse — retrofitting screen reader support onto a visually-designed interface — is where most accessibility debt comes from.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="collaboration-heading">
+      <div class="container">
+        <h2 id="collaboration-heading">The Collaboration Model</h2>
+        <p>Every project on this site was built using <a href="https://claude.ai/code" rel="noopener noreferrer">Claude Code</a> — Anthropic's CLI AI tool — as the primary development partner. Claude Code maintains full conversation context across an entire session, can read and edit files, run builds and tests, and reference external documentation.</p>
+        <p>For accessibility work specifically, this means:</p>
+        <ul>
+          <li>WCAG specification knowledge is available at every code decision, not just when someone remembers to check</li>
+          <li>VoiceOver behavior can be described in plain English and translated directly to conformant ARIA markup</li>
+          <li>Accessibility requirements established early in a session are applied consistently to every component that follows</li>
+          <li>Entire accessibility audits can be run against any file or component mid-session, without context switching</li>
+        </ul>
+        <p>This is different from using AI as a code generation shortcut. The collaboration happens at the architecture level — deciding what should be accessible, why, and what a correct implementation looks like for this specific interface. The AI brings specification knowledge and implementation speed. The blind developer brings lived experience and ground-truth testing.</p>
+        <p>Neither is sufficient alone. Together, they ship software that works.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="results-heading">
+      <div class="container">
+        <h2 id="results-heading">Results</h2>
+        <ul class="results-list">
+          <li>
+            <strong>Node-RED Editor</strong> — 1,089-line accessibility layer covering canvas nodes, dialogs, palette, tab bar, and Manage Palette. Built and deployed in a single session. Filed as <a href="https://github.com/node-red/node-red/issues/5505" rel="noopener noreferrer">GitHub issue #5505</a>.
+          </li>
+          <li>
+            <strong>wxaccess</strong> — VoiceOver-first Swift + MapKit app making NEXRAD Level 2 radar data accessible to blind users. Built from scratch with NWS alert integration.
+          </li>
+          <li>
+            <strong>TS-890 Pro</strong> — VoiceOver-first macOS ham radio control app. KNS TCP auth, LAN audio, WDSP noise reduction, FreeDV, WSJT-X, EX menu, 100+ unit tests. Multi-radio support for TS-590, TS-890S, TS-990S.
+          </li>
+          <li>
+            <strong>AetherSDR</strong> — Upstream accessibility contributions including <a href="https://github.com/AetherRadio/AetherSDR/pull/899" rel="noopener noreferrer">PR #899 (merged)</a>, adding VoiceOver labels, focus management, and keyboard navigation to the SDR application.
+          </li>
+          <li>
+            <strong>open890</strong> — Accessibility contributions to an Elixir/Phoenix ham radio web application, including screen reader-compatible bandscope and meter displays.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cta-heading">
+      <div class="container">
+        <h2 id="cta-heading">Want to Try It?</h2>
+        <p>The <a href="/examples.html">Examples page</a> has working accessibility patterns — skip links, live regions, focus-managed dialogs, accessible forms, and more — that you can use as test cases for your own screen reader testing or as starting points for accessible components.</p>
+        <p>All code is plain HTML and CSS. No frameworks, no dependencies. Copy what's useful.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Built by <a href="https://github.com/w9fyi" rel="noopener noreferrer">Justin Mann (@w9fyi)</a> &mdash; AI5OS &mdash; Austin, TX</p>
+      <p class="footer-note">Built with semantic HTML and zero JavaScript. WCAG 2.2 AAA contrast throughout.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

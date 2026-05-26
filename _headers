@@ -3,3 +3,6 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Content-Security-Policy: default-src 'self'; style-src 'self'; script-src 'none'; img-src 'self'
+
+/examples.html
+  Content-Security-Policy: default-src 'self'; style-src 'self'; script-src 'unsafe-inline'; img-src 'self'
