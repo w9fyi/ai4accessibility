@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI4Accessibility — AI as an Accessibility Tool</title>
+  <meta name="description" content="Documenting how AI-assisted development makes software accessible to blind and low-vision users. Projects by Justin Mann (AI5OS), Austin TX.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header role="banner">
+    <div class="container">
+      <a href="/" class="site-title">AI<span class="accent">4</span>Accessibility</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#approach">Approach</a></li>
+          <li><a href="https://github.com/w9fyi" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading">AI is one of the most powerful <span class="accent">accessibility tools</span> ever built.</h1>
+        <p class="hero-sub">This site documents what happens when a blind developer uses AI as a full development partner — not a shortcut, but a collaborator that never gets tired of thinking about edge cases.</p>
+      </div>
+    </section>
+
+    <section id="about" class="section" aria-labelledby="about-heading">
+      <div class="container">
+        <h2 id="about-heading">About</h2>
+        <p>I'm Justin Mann (AI5OS / W9FYI), a blind software developer and ham radio operator based in Austin, Texas. I work at Apple as an AppleCare advisor and build accessibility-focused software in my spare time.</p>
+        <p>Sighted developers often move on before accessibility gets done. AI changes that — it can hold an entire accessibility specification in context, generate conformant markup, and flag what's missing, all without losing focus. That's the premise this site documents.</p>
+        <p>All projects are built VoiceOver-first on macOS. The code lives on <a href="https://github.com/w9fyi" rel="noopener noreferrer">GitHub at @w9fyi</a>.</p>
+      </div>
+    </section>
+
+    <section id="projects" class="section" aria-labelledby="projects-heading">
+      <div class="container">
+        <h2 id="projects-heading">Projects</h2>
+
+        <article class="project" aria-labelledby="nodered-heading">
+          <h3 id="nodered-heading">Node-RED Editor Accessibility</h3>
+          <p class="project-meta">1,089 lines &mdash; Filed as <a href="https://github.com/node-red/node-red/issues/5505" rel="noopener noreferrer">GitHub issue #5505</a></p>
+          <p>Node-RED is a popular open-source flow-based programming environment used for home automation, IoT, and data pipelines. Its visual canvas editor had zero screen reader support — no labels, no keyboard navigation, no announcements.</p>
+          <p>Working with Claude, a complete accessibility layer (<code>palette-a11y.js</code>) was built and deployed in a single session. It injects into the Node-RED editor using the platform's own theme system, adding ARIA roles and labels to the canvas, keyboard navigation for the palette and tabs, live region announcements for deploy and error status, and full focus management for dialogs.</p>
+          <p>The fix is running live on a Node-RED instance managing a FlexRadio 8400 and Kenwood TS-890S ham transceiver.</p>
+        </article>
+
+        <article class="project" aria-labelledby="wxaccess-heading">
+          <h3 id="wxaccess-heading">wxaccess — VoiceOver-First NEXRAD Radar</h3>
+          <p class="project-meta">Swift &amp; MapKit &mdash; <a href="https://github.com/w9fyi/wxaccess" rel="noopener noreferrer">GitHub @w9fyi/wxaccess</a></p>
+          <p>NEXRAD weather radar data is freely published by the National Weather Service via AWS S3 — but every existing app displays it as a visual map. For blind users, radar has historically been completely inaccessible.</p>
+          <p>wxaccess is a VoiceOver-first macOS application that fetches NEXRAD Level 2 radar data, decodes binary radar sweeps, and surfaces precipitation and storm data as screen-reader-navigable text. NWS weather alerts are delivered as accessible notifications.</p>
+          <p>Phase 1 is committed and in active development.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section id="approach" class="section" aria-labelledby="approach-heading">
+      <div class="container">
+        <h2 id="approach-heading">The Approach</h2>
+        <p>The common assumption is that AI tools are built for sighted users and accessibility comes later — or not at all. This project inverts that. By using Claude as a full development partner rather than an autocomplete engine, it's possible to:</p>
+        <ul>
+          <li>Build complete accessibility layers from scratch in hours instead of weeks</li>
+          <li>Contribute upstream ARIA and keyboard navigation fixes to open-source projects</li>
+          <li>Ship VoiceOver-first macOS and Swift apps that sighted developers routinely skip</li>
+          <li>Document the process publicly so other blind developers can reuse the patterns</li>
+        </ul>
+        <p>Every project on this site was built by a blind developer, for blind users, with AI as the development partner that made the pace possible.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Built by <a href="https://github.com/w9fyi" rel="noopener noreferrer">Justin Mann (@w9fyi)</a> &mdash; AI5OS &mdash; Austin, TX</p>
+      <p class="footer-note">Built with semantic HTML and zero JavaScript. WCAG 2.2 AAA contrast throughout.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
