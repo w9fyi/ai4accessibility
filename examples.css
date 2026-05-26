@@ -51,6 +51,13 @@
   letter-spacing: -0.02em;
   margin-bottom: 0.75rem;
 }
+.example > h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
 .ex-desc {
   margin-bottom: 0.75rem;
   max-width: 680px;

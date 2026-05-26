@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The API is the UI — AI4Accessibility</title>
+  <meta name="description" content="For screen reader users, the accessibility API is the actual interface. A deep dive into browser AX trees, ARIA contracts, REST API design, and why the programmatic layer is all that matters.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="examples.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header role="banner">
+    <div class="container">
+      <a href="/" class="site-title">AI<span class="accent">4</span>Accessibility</a>
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/built-with-ai.html">Built with AI</a></li>
+          <li><a href="/examples.html">Examples</a></li>
+          <li><a href="/api-is-the-ui.html" aria-current="page">API is the UI</a></li>
+          <li><a href="https://github.com/w9fyi" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading">The <span class="accent">API</span> is the UI.</h1>
+        <p class="hero-sub">For screen reader users, the programmatic accessibility layer isn't an accommodation bolted onto the interface. It is the interface. Here's what that means for every developer who builds with data, designs components, or ships APIs that someone else consumes.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="concept-heading">
+      <div class="container">
+        <h2 id="concept-heading">What This Means</h2>
+        <p>When a sighted developer opens an app, they see a rendered interface: colors, layout, icons, animation. That's their UI. When I open the same app with VoiceOver, I don't experience any of that. What I experience is the accessibility tree — a structured, queryable representation of the interface that the operating system extracts from the DOM and exposes to assistive technology.</p>
+        <p>If a button has no accessible name in the AX tree, that button doesn't exist for me. If a chart renders as a canvas element with no ARIA fallback, that chart has no content. If a data API returns unlabeled arrays, I can't build anything accessible on top of it. The visual layer is irrelevant. The programmatic layer is everything.</p>
+        <p>This plays out at three levels:</p>
+        <ul>
+          <li><strong>The browser accessibility tree</strong> — what VoiceOver, NVDA, and JAWS actually read. Built from HTML semantics and ARIA attributes.</li>
+          <li><strong>The platform accessibility protocol</strong> — on iOS and macOS, every UI element must implement <code>UIAccessibility</code> or <code>NSAccessibility</code>. VoiceOver reads the protocol, not the pixels.</li>
+          <li><strong>Data APIs</strong> — REST and JSON APIs that serve content to accessibility-dependent applications need to treat machine-readable labels, descriptions, and structure as first-class fields, not optional metadata.</li>
+        </ul>
+        <p>The insight is the same at every level: the programmatic interface between the application and the assistive technology is the actual user interface for a large slice of users. Build that interface well, and the experience works. Treat it as an afterthought, and no amount of visual polish fixes anything.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="case-studies-heading">
+      <div class="container">
+        <h2 id="case-studies-heading">Case Studies</h2>
+
+        <article class="project" aria-labelledby="govuk-heading">
+          <h3 id="govuk-heading">GOV.UK Design System — Semantic HTML as the Component API</h3>
+          <p class="project-meta">Government Digital Service, United Kingdom</p>
+          <p>GOV.UK runs on a design system that deliberately treats semantic HTML as the accessibility API for every component. The team documented that 4.5% of GOV.UK users rely on screen readers — a number large enough to represent millions of sessions across a government estate of thousands of services.</p>
+          <p>Their component API isn't defined in JavaScript or TypeScript. It's defined in HTML semantics. A notification banner component exposes its state through <code>role="region"</code> and a visible heading. A tabs component uses native <code>&lt;details&gt;</code> as a fallback. Error summaries use <code>role="alert"</code>. The contract between the component and the screen reader is the markup itself.</p>
+          <p>The design principle behind this is explicit: if the semantic HTML doesn't communicate the component's state and purpose, the component is broken — regardless of how it looks. Visual design is layered on top of a conformant accessibility structure, not the other way around. This is the correct architecture. It's also the hard one to sell to teams that prototype visually first.</p>
+        </article>
+
+        <article class="project" aria-labelledby="twitter-heading">
+          <h3 id="twitter-heading">Twitter/X Alt Text API — Image Description as First-Class Data</h3>
+          <p class="project-meta">Twitter v2 API, 2016 launch — reminder feature added 2022</p>
+          <p>In 2016, Twitter added an <code>alt_text</code> field to the media object in its API. This was a significant architectural decision: image descriptions became a first-class field in the data model, not a UI feature layered on top. Every application built on the Twitter API could read and write alt text using the same mechanism as any other media property.</p>
+          <p>The impact of where you put a field in an API is hard to overstate. When alt text lives in the API contract, every client automatically gets access to it. When it's a UI-only affordance, only the native app ever exposes it, and every third-party client — including the accessible clients that blind users often build or rely on — never gets it at all.</p>
+          <p>In 2022, Twitter added an opt-in reminder that prompts users to add alt text before posting an image. This is the UI surface. But the feature only works because the API already had the field. The lesson: accessibility infrastructure in an API enables accessibility features in UIs. You can't build the reminder feature if the field doesn't exist in the data model.</p>
+        </article>
+
+        <article class="project" aria-labelledby="highcharts-heading">
+          <h3 id="highcharts-heading">Highcharts Accessibility Module — The Chart Data IS Available</h3>
+          <p class="project-meta">Highcharts AS — accessibility module shipped as core since v7.1</p>
+          <p>Charts are one of the hardest accessibility problems on the web. A bar chart is visually intuitive. Described as a canvas bitmap to a screen reader, it's completely opaque. Highcharts solved this at the API level: every chart automatically generates a hidden accessible data table in the DOM, representing the same data the chart visualizes. VoiceOver can navigate that table as it would any other HTML table.</p>
+          <p>What makes this architecturally interesting is how the accessible table gets populated. Highcharts exposes chart data through a JavaScript API: <code>chart.series[0].data</code> returns the data points as an array of objects. The accessibility module reads that same API and renders the table from it. The accessible representation and the visual representation share a single source of truth — the chart data API.</p>
+          <p>ARIA live regions fire when chart data updates asynchronously, announcing the change to users who aren't looking at the chart area. The entire accessibility layer is built on top of the programmatic data API, not scraped from the visual output. This is the pattern every charting library should follow.</p>
+        </article>
+
+        <article class="project" aria-labelledby="section508-heading">
+          <h3 id="section508-heading">U.S. Federal Section 508 — Accessible Data at api.weather.gov</h3>
+          <p class="project-meta">2018 Section 508 Refresh — WCAG 2.0 Level AA for federal ICT</p>
+          <p>The 2018 Section 508 refresh extended the accessibility requirement beyond web pages to all Information and Communications Technology — including APIs and data services. Federal data APIs at data.gov, api.census.gov, and api.weather.gov must serve accessible data, meaning the data they return has to be usable by assistive technology-dependent applications.</p>
+          <p>The National Weather Service API at <code>api.weather.gov</code> is a concrete example of this done well. A request to the <code>/gridpoints/{office}/{grid_x},{grid_y}/forecast</code> endpoint returns structured JSON where each forecast period includes a <code>detailedForecast</code> field: a human-readable plain-text description of the weather. "Tonight: Mostly clear, with a low around 68. South wind 5 to 10 mph." That field is machine-readable, screen reader-ready, and requires zero post-processing to present accessibly.</p>
+          <p>This is what accessible API design looks like in practice. Not just numeric values that a developer has to decode and narrate — but labeled, structured, plain-language data alongside the raw numbers. My wxaccess project uses exactly this field to surface NWS forecasts to VoiceOver users who can't read a radar map.</p>
+        </article>
+
+        <article class="project" aria-labelledby="apple-heading">
+          <h3 id="apple-heading">Apple UIAccessibility Protocol — Literally the API is the UI</h3>
+          <p class="project-meta">iOS / macOS — UIAccessibility (iOS) and NSAccessibility (macOS)</p>
+          <p>Apple's platform accessibility model is the cleanest implementation of the "API is the UI" principle I know of. On iOS, every UIKit and SwiftUI view that VoiceOver can interact with must conform to the <code>UIAccessibility</code> informal protocol. VoiceOver doesn't render the view — it queries the accessibility API. The properties it reads — <code>accessibilityLabel</code>, <code>accessibilityValue</code>, <code>accessibilityTraits</code>, <code>accessibilityHint</code> — are the interface.</p>
+          <p>When a developer sets <code>accessibilityLabel = "Volume slider"</code> on a custom control, that string is literally what VoiceOver announces. There's no visual parsing, no heuristic inference, no fallback to coordinates. The label in the API is the label in the experience. If the developer doesn't set it, VoiceOver announces nothing useful and the control is inaccessible.</p>
+          <p>On macOS, the same principle holds via <code>NSAccessibility</code>. VoiceOver queries each element's accessibility role, description, and value through this protocol. Custom AppKit views that don't implement the protocol correctly are invisible to VoiceOver — regardless of how they look on screen. This is why I build TS-890 Pro VoiceOver-first: if the accessibility protocol properties aren't right, the app doesn't work for me, and no amount of visual refinement changes that.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="patterns-heading">
+      <div class="container">
+        <h2 id="patterns-heading">Developer Patterns</h2>
+        <p>These patterns translate the "API is the UI" principle into concrete code. Each one is something I've used or needed when building accessible applications on top of APIs and platform accessibility protocols.</p>
+
+        <article class="example" id="api-json" aria-labelledby="ex-api-json-heading">
+          <h3 id="ex-api-json-heading">1. Designing an Accessible REST API Response</h3>
+          <p class="ex-desc">When an API response is going to be consumed by a UI that serves screen reader users, the response should include human-readable labels and descriptions alongside the raw data. This isn't about the API being "accessible" in the WCAG sense — it's about giving the consuming application what it needs to be accessible without extra inference work.</p>
+          <p class="ex-note"><strong>The principle:</strong> Every field a UI needs to speak aloud to a user should exist as a labeled string in the API response. Never make the client derive or narrate values from raw numbers alone.</p>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>// Inaccessible API response — client has to infer everything
+{
+  "temp": 71,
+  "wind": 12,
+  "dir": 270,
+  "precip": 0.03
+}
+
+// Accessible API response — labeled, human-readable fields alongside raw data
+{
+  "temperature": {
+    "value": 71,
+    "unit": "fahrenheit",
+    "label": "71 degrees Fahrenheit"
+  },
+  "wind": {
+    "speed_mph": 12,
+    "direction_degrees": 270,
+    "label": "West wind at 12 miles per hour"
+  },
+  "precipitation": {
+    "inches": 0.03,
+    "label": "Light rain, 0.03 inches"
+  },
+  "summary": "Partly cloudy with a west wind at 12 mph. Temperature 71°F. Light rain possible.",
+  "image": {
+    "url": "https://example.com/icons/partly-cloudy.png",
+    "alt": "Partly cloudy sky"
+  }
+}
+
+// The NWS API at api.weather.gov follows this pattern:
+// GET https://api.weather.gov/gridpoints/EWX/155,91/forecast
+// Each period in the response includes:
+// "detailedForecast": "Tonight: Partly cloudy. Low around 68. South wind 5 to 10 mph."
+// That string requires zero post-processing to present to a VoiceOver user.</code></pre>
+          </details>
+        </article>
+
+        <article class="example" id="api-table" aria-labelledby="ex-api-table-heading">
+          <h3 id="ex-api-table-heading">2. Building an Accessible Data Table from API JSON</h3>
+          <p class="ex-desc">When an API returns tabular data, the right accessible output is an HTML <code>&lt;table&gt;</code> with a caption, scoped headers, and semantic structure. A screen reader user navigating this with VoiceOver will hear the column header announced with each cell value automatically — but only if the table is marked up correctly.</p>
+          <p class="ex-note"><strong>Test with VoiceOver:</strong> Navigate into the rendered table. Arrow right through cells. VoiceOver should announce "Band: 20m, Frequency: 14.0 to 14.35 MHz" — the header context travels with each cell automatically.</p>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>// API response: array of objects with consistent keys
+const bands = [
+  { band: "40m", freq: "7.0–7.3 MHz",    license: "General",    use: "Domestic + DX SSB, CW" },
+  { band: "20m", freq: "14.0–14.35 MHz", license: "General",    use: "International DX" },
+  { band: "10m", freq: "28.0–29.7 MHz",  license: "Technician", use: "SSB, FM, digital" }
+];
+
+// Render as an accessible HTML table
+// caption describes the table's subject — required for screen reader context
+// scope="col" associates each header cell with its column
+function renderBandTable(bands) {
+  return `
+    &lt;table&gt;
+      &lt;caption&gt;Amateur radio HF band plan&lt;/caption&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th scope="col"&gt;Band&lt;/th&gt;
+          &lt;th scope="col"&gt;Frequency&lt;/th&gt;
+          &lt;th scope="col"&gt;License&lt;/th&gt;
+          &lt;th scope="col"&gt;Typical use&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        ${bands.map(b =&gt; `
+        &lt;tr&gt;
+          &lt;td&gt;${b.band}&lt;/td&gt;
+          &lt;td&gt;${b.freq}&lt;/td&gt;
+          &lt;td&gt;${b.license}&lt;/td&gt;
+          &lt;td&gt;${b.use}&lt;/td&gt;
+        &lt;/tr&gt;`).join('')}
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  `;
+}
+
+// What NOT to do:
+// &lt;div class="table-row"&gt;          -- no semantic structure
+// &lt;span class="cell"&gt;20m&lt;/span&gt;  -- VoiceOver reads cells with no column context
+// CSS grid that looks like a table  -- completely opaque to screen readers</code></pre>
+          </details>
+        </article>
+
+        <article class="example" id="live-region-api" aria-labelledby="ex-live-region-api-heading">
+          <h3 id="ex-live-region-api-heading">3. ARIA Live Regions as an Async Notification API</h3>
+          <p class="ex-desc">When an application fetches data asynchronously — a new message, a status update, a completed background task — screen reader users won't know something changed unless you tell them. ARIA live regions are the notification API that bridges async application state to the user's ears. Think of <code>role="status"</code> as a polite push notification and <code>role="alert"</code> as an interrupt.</p>
+          <p class="ex-note"><strong>The rule:</strong> Any application state change that a sighted user perceives visually — a spinner that resolves, a count that increments, a row that appears — needs a programmatic announcement for screen reader users. Live regions are that announcement channel.</p>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Live regions must exist in the DOM before content is injected.
+     Create them on page load, empty. Inject text when events fire. --&gt;
+
+&lt;!-- Polite: waits for the user to finish before announcing --&gt;
+&lt;div id="status-region"
+     role="status"
+     aria-live="polite"
+     aria-atomic="true"&gt;&lt;/div&gt;
+
+&lt;!-- Assertive: interrupts whatever VoiceOver is currently reading --&gt;
+&lt;div id="error-region"
+     role="alert"
+     aria-live="assertive"
+     aria-atomic="true"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+  // Wrap announcements in a utility — every async operation uses the same channel
+  function announce(message, type = 'polite') {
+    const region = type === 'assertive'
+      ? document.getElementById('error-region')
+      : document.getElementById('status-region');
+
+    // Clear then set — ensures re-announcement even if the message is identical
+    region.textContent = '';
+    requestAnimationFrame(() =&gt; {
+      region.textContent = message;
+    });
+  }
+
+  // Use wherever async state changes happen
+  async function fetchForecast(lat, lon) {
+    announce('Loading forecast...');
+    try {
+      const res = await fetch(`/api/forecast?lat=${lat}&amp;lon=${lon}`);
+      const data = await res.json();
+      announce(`Forecast loaded. ${data.summary}`);
+      renderForecast(data);
+    } catch (err) {
+      announce('Forecast failed to load. Please try again.', 'assertive');
+    }
+  }
+
+  // Background polling: announce only meaningful state transitions
+  // Don't announce every poll tick — only when status actually changes
+  let lastStatus = null;
+  function pollRadioStatus() {
+    setInterval(async () =&gt; {
+      const status = await fetchRadioStatus();
+      if (status !== lastStatus) {
+        announce(`Radio status: ${status}`);
+        lastStatus = status;
+      }
+    }, 5000);
+  }
+&lt;/script&gt;</code></pre>
+          </details>
+        </article>
+
+        <article class="example" id="ax-tree" aria-labelledby="ex-ax-tree-heading">
+          <h3 id="ex-ax-tree-heading">4. Reading the Accessibility Tree with DevTools and axe-core</h3>
+          <p class="ex-desc">The browser exposes the accessibility tree in DevTools — this is the data structure that VoiceOver actually reads. Chrome's Accessibility panel and Firefox's Accessibility Inspector both show the computed AX tree for any element. Learning to read it is the same as learning to read the DOM: it's the source of truth for what a screen reader user experiences.</p>
+          <p class="ex-note"><strong>To inspect:</strong> In Chrome DevTools, open the Elements panel, select a node, and click the "Accessibility" tab in the right panel. You'll see the element's computed accessible name, role, and description — exactly what VoiceOver reads. If "Name" is empty, that element is broken for screen reader users.</p>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>// --- Using axe-core to audit the AX tree programmatically ---
+// axe-core is the engine behind many accessibility testing tools.
+// It queries the accessibility tree and reports violations.
+
+// Install: npm install axe-core
+import axe from 'axe-core';
+
+async function auditPage() {
+  const results = await axe.run();
+
+  // violations: things that are definitely broken
+  results.violations.forEach(violation =&gt; {
+    console.error(`[${violation.impact}] ${violation.description}`);
+    violation.nodes.forEach(node =&gt; {
+      console.error('  Failing element:', node.html);
+      console.error('  Fix:', node.failureSummary);
+    });
+  });
+
+  // incomplete: things axe couldn't auto-determine — need human review
+  // These are often the most important — color contrast, label sufficiency
+  results.incomplete.forEach(item =&gt; {
+    console.warn(`[needs review] ${item.description}`);
+  });
+}
+
+// --- CI integration with Playwright ---
+// Fail a build if accessibility regressions are introduced.
+
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('forecast table is accessible', async ({ page }) =&gt; {
+  await page.goto('/forecast');
+  const results = await new AxeBuilder({ page })
+    .include('#forecast-table')
+    .analyze();
+  expect(results.violations).toHaveLength(0);
+});
+
+// --- Quick checks in the Chrome DevTools console ---
+// These mirror exactly what VoiceOver reads:
+// document.querySelector('button').computedRole  // e.g. "button"
+// document.querySelector('button').computedName  // e.g. "Submit form"
+// If computedName is "" — the element has no accessible name.
+// That is an accessibility failure, not a warning.</code></pre>
+          </details>
+        </article>
+
+        <article class="example" id="chart-fallback" aria-labelledby="ex-chart-heading">
+          <h3 id="ex-chart-heading">5. Chart with Accessible Data Table Fallback</h3>
+          <p class="ex-desc">A canvas or SVG chart is opaque to screen readers unless you provide an alternative. The right pattern — used by Highcharts — is to render the chart data as a visually hidden HTML table in the same DOM. Screen reader users navigate the table; sighted users see the chart. Both consume the same data source. No duplication, no split maintenance.</p>
+          <p class="ex-note"><strong>The key:</strong> The accessible table is hidden with the <code>.sr-only</code> clip technique — removed from visual flow but present in the AX tree. Using <code>display: none</code> would remove it from both, making it invisible to VoiceOver too. Use <code>aria-hidden="true"</code> on the canvas to exclude the blank element from the AX tree entirely.</p>
+
+          <details class="code-block">
+            <summary>View code</summary>
+            <pre><code>&lt;!-- Chart component structure --&gt;
+&lt;figure aria-labelledby="chart-caption"&gt;
+
+  &lt;figcaption id="chart-caption"&gt;
+    Monthly precipitation — Austin TX, January–June 2024
+  &lt;/figcaption&gt;
+
+  &lt;!-- Visual chart: aria-hidden removes the blank canvas from the AX tree --&gt;
+  &lt;canvas
+    aria-hidden="true"
+    id="precip-chart"
+    width="600"
+    height="300"&gt;
+  &lt;/canvas&gt;
+
+  &lt;!-- Accessible data table: sr-only hides it visually, keeps it in the AX tree --&gt;
+  &lt;table class="sr-only"&gt;
+    &lt;caption&gt;Monthly precipitation data — Austin TX, January–June 2024&lt;/caption&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th scope="col"&gt;Month&lt;/th&gt;
+        &lt;th scope="col"&gt;Precipitation (inches)&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="chart-data-table"&gt;
+      &lt;!-- Populated from the same data array used to render the chart --&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+&lt;/figure&gt;
+
+&lt;script&gt;
+  // Single data source for both the chart and the accessible table
+  const precipData = [
+    { month: "January",  inches: 1.84 },
+    { month: "February", inches: 2.12 },
+    { month: "March",    inches: 1.96 },
+    { month: "April",    inches: 2.89 },
+    { month: "May",      inches: 4.10 },
+    { month: "June",     inches: 3.22 }
+  ];
+
+  // Populate both the accessible table and the visual chart from the same array
+  const tbody = document.getElementById('chart-data-table');
+  precipData.forEach(point =&gt; {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      &lt;td&gt;${point.month}&lt;/td&gt;
+      &lt;td&gt;${point.inches} inches&lt;/td&gt;
+    `;
+    tbody.appendChild(row);
+  });
+
+  renderChart('precip-chart', precipData);
+&lt;/script&gt;
+
+&lt;style&gt;
+  /* sr-only: removes from visual flow, keeps in AX tree */
+  /* Do NOT use display:none — that removes it from the AX tree entirely */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+&lt;/style&gt;</code></pre>
+          </details>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="designers-heading">
+      <div class="container">
+        <h2 id="designers-heading">What This Means If You Design APIs</h2>
+        <p>You may not think of yourself as building an accessibility feature when you design a REST API. But if your API is going to be consumed by a UI, and that UI is going to be used by screen reader users, you are in the accessibility stack whether you intended to be or not.</p>
+        <p>A few concrete questions worth asking at API design time:</p>
+        <ul>
+          <li><strong>Does every media object have an alt text field?</strong> If your API serves images, the alt text field should be in the data model — not an optional UI hint. Twitter's <code>alt_text</code> field on media objects is the model to follow.</li>
+          <li><strong>Does the API return human-readable labels alongside raw values?</strong> A value of <code>270</code> for wind direction means nothing to a consuming application that needs to speak it. A <code>label</code> field with "West wind" removes an entire class of accessible narration bugs from every client.</li>
+          <li><strong>Are structured data objects labeled?</strong> A list of items should include a <code>title</code> or <code>name</code> field on each item. An unlabeled array of coordinate pairs or numeric IDs forces every client to do lookup work that produces inconsistent results.</li>
+          <li><strong>Are errors human-readable?</strong> An error response with a <code>message</code> field is accessible to clients that need to surface the error in a live region. A numeric error code alone is not.</li>
+          <li><strong>Is the response order semantic?</strong> Screen reader users experience lists linearly. If the order of results matters for comprehension, the API should return results in reading order, not render order.</li>
+        </ul>
+        <p>These aren't accessibility-only concerns. A human-readable label field is useful for logging, debugging, localization, and anywhere the data is displayed without a render pipeline. Accessible API design is just good API design with the spoken interface as an explicit consumer.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="closing-heading">
+      <div class="container">
+        <h2 id="closing-heading">The Stack Nobody Talks About</h2>
+        <p>There's a whole accessibility stack that most web developers never see because they test with a mouse: the DOM, the AX tree, the platform accessibility protocol, the screen reader. Each layer is a contract. The DOM is a contract with the browser. The AX tree is a contract with assistive technology. The platform protocol is a contract with the operating system. ARIA is the annotation layer that makes implicit contracts explicit when HTML semantics aren't enough.</p>
+        <p>I navigate this stack every day — not as a debugging exercise but as a user. When a button has no accessible name, I don't see a gap in the UI. I hear "button" and nothing else. When a chart has no data table fallback, I don't see a blank space. The chart simply doesn't exist in my experience of the page.</p>
+        <p>The "API is the UI" framing is useful because it shifts the conversation from "we need to add accessibility" to "we need to build the right interface." For 4.5% of GOV.UK users, the accessibility tree is the only interface. For all VoiceOver users on iOS and macOS, the <code>UIAccessibility</code> protocol is the only interface. For any accessible application consuming a data API, the field names and structure of that API are the interface.</p>
+        <p>Build those interfaces well. Not as an afterthought. Not as an audit checklist item. As the primary design surface for a real population of users who depend on it.</p>
+        <p>&mdash; Justin Mann (<a href="https://github.com/w9fyi" rel="noopener noreferrer">@w9fyi</a>), Austin TX</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container">
+      <p>Built by <a href="https://github.com/w9fyi" rel="noopener noreferrer">Justin Mann (@w9fyi)</a> &mdash; AI5OS &mdash; Austin, TX</p>
+      <p class="footer-note">Built with semantic HTML and zero JavaScript. WCAG 2.2 AAA contrast throughout.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
